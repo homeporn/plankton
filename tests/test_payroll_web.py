@@ -324,3 +324,32 @@ def test_global_dashboard_has_no_accrual_totals(client, payroll_case):
     page = get(client, "/").get_data(as_text=True)
     assert "Фонд управленческих начислений" not in page and "5600" not in page
     assert "5600" in get(client, "/payroll").get_data(as_text=True)
+
+
+def test_overview_creates_period_for_filtered_contractor_and_month(client, payroll_case):
+    from html import unescape
+
+    contractor = payroll_case["contractor"]
+    overview = get(client, f"/payroll?contractor_id={contractor}&year=2025&month=9").get_data(as_text=True)
+    link = re.search(r'href="(/payroll/periods/new\?[^"]+)"', overview)
+    assert link
+    form_page = get(client, unescape(link.group(1))).get_data(as_text=True)
+    assert f'value="{contractor}" selected' in form_page
+    assert 'value="2025" required' in form_page and 'value="9" required' in form_page
+
+
+def test_period_sources_and_review_action_reflect_failed_calculation(client, payroll_case):
+    # Approved hours exist, but the synthetic contractor has no pay terms.
+    created = post(client, "/payroll/periods/new", form(contractor_id=payroll_case["contractor"],
+        year="2026", month="10", norm_hours="160"))
+    assert created.status_code == 303
+    url = created.headers["Location"]
+    draft = get(client, url).get_data(as_text=True)
+    assert "Исходные данные периода" in draft and "Утверждённый табель" in draft
+    assert "Нет действующих условий" in draft
+    period = payroll_case["repo"].list_periods()[0]
+    version = payroll_case["repo"].get_version(period["id"])
+    assert action(client, version["id"], "calculate").status_code == 303
+    result = get(client, url).get_data(as_text=True)
+    assert "Источники сохранённого расчёта" in result
+    assert 'name="action" value="submit"' not in result

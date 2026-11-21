@@ -1,0 +1,12 @@
+{
+  "status": "awaiting-approved-svg",
+  "placeholder": "placeholder.svg",
+  "variants": {
+    "horizontal": null,
+    "vertical": null,
+    "symbol-only": null,
+    "monochrome": null,
+    "light": null,
+    "dark": null
+  }
+}

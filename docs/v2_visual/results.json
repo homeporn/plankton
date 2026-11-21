@@ -1,0 +1,194 @@
+{
+  "longNameLength": 157,
+  "profiles": [
+    {
+      "browser": "Chrome/156.0.8078.79",
+      "zoom": 1,
+      "pages": {
+        "/": {
+          "window": 1366,
+          "layout": 1366,
+          "document": 1366,
+          "dpr": 1
+        },
+        "/projects": {
+          "window": 1366,
+          "layout": 1366,
+          "document": 1366,
+          "dpr": 1
+        },
+        "/settings": {
+          "window": 1366,
+          "layout": 1366,
+          "document": 1366,
+          "dpr": 1
+        },
+        "/facts": {
+          "window": 1366,
+          "layout": 1366,
+          "document": 1366,
+          "dpr": 1
+        },
+        "/confirmations": {
+          "window": 1366,
+          "layout": 1366,
+          "document": 1366,
+          "dpr": 1
+        },
+        "/work-orders/new": {
+          "window": 1366,
+          "layout": 1366,
+          "document": 1366,
+          "dpr": 1
+        },
+        "/timesheets/1": {
+          "window": 1366,
+          "layout": 1366,
+          "document": 1366,
+          "dpr": 1
+        }
+      },
+      "matrix": {
+        "container": 1052,
+        "content": 1867,
+        "keyboardScroll": 40
+      },
+      "contrast": {
+        "tableHeading": 8.74,
+        "help": 8.28,
+        "placeholder": 8.28,
+        "primaryAction": 8.78
+      },
+      "requiredFieldFeedback": true,
+      "serverErrorRetainsInput": true,
+      "themes": {
+        "light": {
+          "primary": 8.78,
+          "subtitle": 9.92,
+          "queue": 13.2
+        },
+        "dark": {
+          "primary": 13.2,
+          "subtitle": 11.43,
+          "queue": 8.78
+        }
+      },
+      "fonts": [
+        [
+          "DejaVu Sans",
+          "400"
+        ],
+        [
+          "DejaVu Sans",
+          "700"
+        ]
+      ]
+    },
+    {
+      "browser": "Chrome/156.0.8078.79",
+      "zoom": 1.5,
+      "pages": {
+        "/": {
+          "window": 1366,
+          "layout": 911,
+          "document": 911,
+          "dpr": 1.5
+        },
+        "/projects": {
+          "window": 1366,
+          "layout": 911,
+          "document": 911,
+          "dpr": 1.5
+        },
+        "/settings": {
+          "window": 1366,
+          "layout": 911,
+          "document": 911,
+          "dpr": 1.5
+        },
+        "/facts": {
+          "window": 1366,
+          "layout": 911,
+          "document": 911,
+          "dpr": 1.5
+        },
+        "/confirmations": {
+          "window": 1366,
+          "layout": 911,
+          "document": 911,
+          "dpr": 1.5
+        },
+        "/work-orders/new": {
+          "window": 1366,
+          "layout": 911,
+          "document": 911,
+          "dpr": 1.5
+        },
+        "/timesheets/1": {
+          "window": 1366,
+          "layout": 911,
+          "document": 911,
+          "dpr": 1.5
+        }
+      },
+      "matrix": {
+        "container": 615,
+        "content": 1865,
+        "keyboardScroll": 26.66666603088379
+      }
+    },
+    {
+      "browser": "Chrome/156.0.8078.79",
+      "zoom": 2,
+      "pages": {
+        "/": {
+          "window": 1366,
+          "layout": 683,
+          "document": 683,
+          "dpr": 2
+        },
+        "/projects": {
+          "window": 1366,
+          "layout": 683,
+          "document": 683,
+          "dpr": 2
+        },
+        "/settings": {
+          "window": 1366,
+          "layout": 683,
+          "document": 683,
+          "dpr": 2
+        },
+        "/facts": {
+          "window": 1366,
+          "layout": 683,
+          "document": 683,
+          "dpr": 2
+        },
+        "/confirmations": {
+          "window": 1366,
+          "layout": 683,
+          "document": 683,
+          "dpr": 2
+        },
+        "/work-orders/new": {
+          "window": 1366,
+          "layout": 683,
+          "document": 683,
+          "dpr": 2
+        },
+        "/timesheets/1": {
+          "window": 1366,
+          "layout": 683,
+          "document": 683,
+          "dpr": 2
+        }
+      },
+      "matrix": {
+        "container": 645,
+        "content": 1821,
+        "keyboardScroll": 20
+      }
+    }
+  ]
+}

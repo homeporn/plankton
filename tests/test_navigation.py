@@ -16,12 +16,12 @@ def main_menu(response):
 def test_navigation_sections_and_unique_canonical_links(client):
     menu = main_menu(get(client, '/'))
     assert set(re.findall(r'data-nav-group="([^"]+)"', menu)) == {group[0] for group in GROUPS}
-    assert 'Объекты и объёмы' in menu and 'Рабочее время' in menu
-    assert 'Персонал и бригады' in menu and 'Справочники и настройки' in menu
+    assert 'Производство' in menu and 'Табели' in menu
+    assert 'Люди и время' in menu and 'Администрирование' in menu
     links = re.findall(r'href="([^"]+)"', menu)
     assert len(links) == len(set(links))
     assert '/timesheets?history=1' in links and '/timesheets/new' in links
-    assert 'Зарплата' not in menu and 'Производительность' in menu
+    assert 'Зарплата' not in menu and 'Эффективность' in menu
 
 
 def test_menu_opened_groups_and_collapsed_sidebar_persist_in_session(client):
@@ -33,7 +33,7 @@ def test_menu_opened_groups_and_collapsed_sidebar_persist_in_session(client):
     assert '<body class="nav-collapsed">' in page
     assert re.search(r'data-nav-group="production"\s+open', page)
     assert re.search(r'data-nav-group="personnel"\s+open', page)
-    assert not re.search(r'data-nav-group="objects"\s+open', page)
+    assert not re.search(r'data-nav-group="settings"\s+open', page)
     assert post(client, '/navigation/state', dict(collapsed='0')).status_code == 200
     assert '<body class="">' in get(client, '/').get_data(as_text=True)
 
@@ -115,7 +115,7 @@ def test_settings_read_only_local_environment_page(client, db):
 
 @pytest.mark.parametrize('path,expected', [
     ('/personnel/employees/new', ('personnel', 'workers')),
-    ('/personnel/contractors/new', ('settings', 'contractors')),
+    ('/personnel/contractors/new', ('personnel', 'contractors')),
     ('/personnel/specialties/new', ('settings', 'specialties')),
     ('/work-orders/new', ('production', 'orders')),
     ('/analytics/groups/new', ('analytics', 'groups'))])
@@ -130,3 +130,20 @@ def test_navigation_assets_are_local_and_use_older_safari_fallback(client):
     script = get(client, '/static/js/navigation.js').get_data(as_text=True)
     assert 'media.addListener' in script and 'credentials: "same-origin"' in script
     assert 'https://' not in script and 'http://' not in script
+
+
+def test_dashboard_excludes_current_work_queues_from_historical_snapshot(client):
+    current = get(client, "/").get_data(as_text=True)
+    historical = get(client, "/?report_date=2025-01-01").get_data(as_text=True)
+    assert 'class="object-actions"' in current
+    assert 'Требует внимания' in current and 'Нет табеля' in current
+    assert 'Требует внимания' not in historical
+    assert '2025-01-01' in historical
+
+
+def test_archived_dashboard_links_only_to_read_workflows(client, db):
+    ProjectRepository(db).set_archived(1, True)
+    page = get(client, "/").get_data(as_text=True)
+    actions = re.search(r'<nav class="object-actions".*?</nav>', page, re.S).group()
+    assert '/work-orders/new' not in actions and '/facts' not in actions
+    assert '/timesheets' in actions and '/payroll' in actions

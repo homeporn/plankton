@@ -344,3 +344,17 @@ def test_inherited_draft_edit_locks_rows_but_serializes_header_and_crew(client,d
     revised=s['orders'].get_order(target)
     assert revised['lines'][0]['id']==line['id'] and revised['lines'][0]['assignment']==20
     assert revised['notes']==values['notes'] and revised['crew']
+
+
+def test_close_action_appears_only_after_remaining_and_review_are_current(client, flow):
+    s = flow
+    fact(s, '120')
+    confirm(s, '100')
+    assert workflow_post(client, s, 'submitted').status_code == 303
+    assert workflow_post(client, s, 'accepted').status_code == 303
+    path = '/work-orders/' + str(s['order'])
+    assert path + '/workflow/closed' not in get(client, path).text
+    confirm(s, '20')
+    assert path + '/workflow/closed' not in get(client, path).text
+    assert workflow_post(client, s, 'accepted').status_code == 303
+    assert path + '/workflow/closed' in get(client, path).text

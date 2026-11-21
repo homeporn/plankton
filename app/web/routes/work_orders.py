@@ -187,10 +187,8 @@ def edit(order_id=None):
     items = repo.available_items()
     return render_template('work_order_form.html', order=order, error=error, available_items=items,
                            item_map={i['id']: i for i in items}, plan_version=version,
-                           buildings=repo.work.list_buildings(include_archived=False), floors=repo.work.list_floors(include_archived=False),
                            contractors=repo.people.list_contractors(), employees=repo.people.list_employees(as_of=order['shift_date']), specialties=repo.people.list_specialties(),
-                           permanent_brigades=BrigadeRepository(get_db(),current_project_id()).list(active_only=True,as_of=order['shift_date']),
-                           elements=sorted({i['element'] for i in items}), work_types=sorted({i['work_type'] for i in items})), 400 if error else 200
+                           permanent_brigades=BrigadeRepository(get_db(),current_project_id()).list(active_only=True,as_of=order['shift_date'])), 400 if error else 200
 
 
 @bp.get('/work-orders/<int:order_id>')
@@ -200,7 +198,38 @@ def detail(order_id):
     effective_cutoff=cutoff if request.args.get('knowledge_cutoff') else None
     with read_snapshot(get_db()):
         order=repo.get_order(order_id, report_date=report_date,knowledge_cutoff=effective_cutoff)
-        control=WorkOrderControlProjection(get_db(),current_project_id()).report(order_id,report_date,order['cutoff'])
+        projection = WorkOrderControlProjection(get_db(), current_project_id())
+        control = projection.report(order_id, report_date, order['cutoff'])
+        writable = current_project()['status'] == 'active' and not order['historical']
+        actions = []
+        blockers = []
+        if writable:
+            status = order['status']
+            if status == 'draft':
+                if not order['lines']:
+                    blockers.append('Добавьте хотя бы одну работу.')
+                if not order['issued_by_employee_id'] or not order['foreman_employee_id']:
+                    blockers.append('Укажите мастера / прораба и бригадира.')
+                if not order['crew']:
+                    blockers.append('Укажите состав бригады.')
+                blockers.extend('Обновите позицию ' + line['work_name_snapshot'] + '.' for line in order['lines']
+                                if line['work_item_id'] not in order['entry_item_ids'])
+                if not blockers:
+                    try:
+                        projection.assert_issue(order_id)
+                    except ValidationError as exc:
+                        blockers.append(str(exc))
+            elif status in ('issued', 'in_progress'):
+                if any(line['actual'] > 0 for line in order['lines']) or not projection.closure_errors(order_id, report_date, order['cutoff']):
+                    actions.append('submitted')
+            elif status in ('submitted', 'accepted'):
+                actions.append('accepted')
+                if status == 'accepted':
+                    blockers = projection.closure_errors(order_id, report_date, order['cutoff'])
+                    if order['accepted_action']['event_signature'] != order['event_signature']:
+                        blockers.append('После изменения данных повторите проверку строк.')
+                    if not blockers:
+                        actions.insert(0, 'closed')
     statuses={r['order_id']:r['status'] for r in control['chain_nodes']}
     for transfer in control['transfers']:
         transfer['source_executor']=json.loads(transfer['source_executor_snapshot'])
@@ -209,7 +238,7 @@ def detail(order_id):
     revoked={r.get('reverses_id') for r in control['timeline'] if r['kind']=='revoke'}
     for row in control['timeline']:
         row['revoked']=row.get('id') in revoked if row['kind']=='writeoff' else False
-    return render_template('work_order_detail.html',order=order,control=control,order_statuses=STATUS_LABELS,
+    return render_template('work_order_detail.html',order=order,control=control,order_statuses=STATUS_LABELS, action_list=actions, blockers=blockers,
         employees=repo.people.list_employees(active_only=True),
         workflow_keys={a:secrets.token_urlsafe(24) for a in ('submitted','accepted','closed')},
         operation_key=secrets.token_urlsafe(24))

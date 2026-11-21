@@ -323,3 +323,15 @@ def test_xlsx_unassigned_sheet_combines_exact_hour_and_volume_remainders_and_fro
         rows = ET.fromstring(archive.read("xl/worksheets/sheet6.xml")).findall("s:sheetData/s:row", N)[1:]
         volume = next(row for row in rows if values(row).get("A") == "Объём" and Decimal(values(row).get("D", "0")) == fact)
         assert Decimal(values(volume)["J"]) == Decimal("-10") and values(volume)["N"] == "Нет"
+
+
+def test_volume_mode_link_keeps_dimensions_and_explains_the_source(client, labor_context):
+    page = get(client, path("works", contractor_id=labor_context["contractor"])).get_data(as_text=True)
+    switch = re.search(r'<a data-volume-switch href="([^"]+)"', page)
+    assert switch
+    url = unescape(switch.group(1))
+    for param in ("mode=confirmed", "start_date=2026-10-01", f'contractor_id={labor_context["contractor"]}'):
+        assert param in url
+    confirmed = get(client, url).get_data(as_text=True)
+    assert "<th>Подтверждённый объём</th>" in confirmed
+    assert "Дополнительные фильтры" in confirmed and "Подтверждённый объём не определяет исполнителя" in confirmed

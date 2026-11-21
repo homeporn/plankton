@@ -345,15 +345,20 @@ def test_archived_building_excluded_from_new_forms_but_available_in_report_filte
     events.add_fact(item, "600", "2026-01-10", event_key="archived")
     events.add_fact(active_item, "600", "2026-01-10", event_key="active")
     work.archive_building(1)
-    for path, action in (("/buildings", "/buildings/floors"), ("/volumes", "/volumes/items"),
-                         ("/facts", ""), ("/confirmations", "")):
+    for path, action in (("/buildings", "/buildings/floors"), ("/volumes", "/volumes/items")):
         html = get(client, path).get_data(as_text=True)
         assert "1" not in FormOptions(html, action, "building_id").values
         assert "2" in FormOptions(html, action, "building_id").values
         assert str(work.list_floors(1)[0]["id"]) not in FormOptions(html, action, "floor_id").values
+    for path in ("/facts", "/confirmations"):
+        html = get(client, path).get_data(as_text=True)
+        choices = FormOptions(html, "", "work_item_id").values
+        assert str(item) not in choices
+        assert str(active_item) in choices
     for path in ("/volumes", "/progress", "/facts", "/confirmations"):
         html = get(client, path).get_data(as_text=True)
-        assert "1" in FormOptions(html, "", "building_id", method="get").values
+        action = path if path in ("/facts", "/confirmations") else ""
+        assert "1" in FormOptions(html, action, "building_id", method="get").values
     response = post(client, "/volumes/items", dict(building_id="1", floor_id=work.list_floors(1)[0]["id"],
                                                    catalog_id="2", discipline="CONSTRUCTION"))
     assert response.status_code == 400

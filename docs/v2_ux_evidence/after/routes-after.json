@@ -1,0 +1,621 @@
+{
+  "/": {
+    "GET": [
+      200,
+      403
+    ]
+  },
+  "/analytics": {
+    "GET": [
+      200,
+      400
+    ]
+  },
+  "/analytics/<tab>": {
+    "GET": [
+      200
+    ]
+  },
+  "/analytics/export.xlsx": {
+    "GET": [
+      200
+    ]
+  },
+  "/analytics/groups/<int:group_id>": {
+    "POST": [
+      303,
+      400
+    ],
+    "GET": [
+      200,
+      400
+    ]
+  },
+  "/analytics/groups/<int:group_id>/actions": {
+    "POST": [
+      303
+    ]
+  },
+  "/analytics/groups/new": {
+    "POST": [
+      303,
+      403
+    ]
+  },
+  "/api/buildings": {
+    "GET": [
+      200
+    ]
+  },
+  "/buildings": {
+    "GET": [
+      200,
+      500
+    ]
+  },
+  "/buildings/floors": {
+    "POST": [
+      303,
+      400,
+      403
+    ]
+  },
+  "/catalog": {
+    "GET": [
+      200
+    ],
+    "POST": [
+      303,
+      400
+    ]
+  },
+  "/catalog/norm": {
+    "POST": [
+      303,
+      400
+    ]
+  },
+  "/confirmations": {
+    "POST": [
+      303,
+      400,
+      500
+    ],
+    "GET": [
+      200,
+      400,
+      500
+    ]
+  },
+  "/facts": {
+    "POST": [
+      303,
+      400
+    ],
+    "GET": [
+      200,
+      400
+    ]
+  },
+  "/labor": {
+    "GET": [
+      200,
+      400
+    ]
+  },
+  "/labor/allocations": {
+    "GET": [
+      200
+    ],
+    "POST": [
+      200,
+      303,
+      400,
+      403
+    ]
+  },
+  "/labor/attributions": {
+    "GET": [
+      200
+    ],
+    "POST": [
+      303,
+      400
+    ]
+  },
+  "/labor/brigades": {
+    "GET": [
+      200
+    ]
+  },
+  "/labor/contractors": {
+    "GET": [
+      200
+    ]
+  },
+  "/labor/export.xlsx": {
+    "GET": [
+      200
+    ]
+  },
+  "/labor/history": {
+    "GET": [
+      200
+    ]
+  },
+  "/labor/works": {
+    "GET": [
+      200
+    ]
+  },
+  "/navigation/state": {
+    "POST": [
+      200,
+      400,
+      403
+    ]
+  },
+  "/payroll": {
+    "GET": [
+      200
+    ]
+  },
+  "/payroll/claims": {
+    "GET": [
+      200
+    ],
+    "POST": [
+      303,
+      400
+    ]
+  },
+  "/payroll/operations": {
+    "GET": [
+      200
+    ],
+    "POST": [
+      303
+    ]
+  },
+  "/payroll/periods": {
+    "GET": [
+      200
+    ]
+  },
+  "/payroll/periods/<int:period_id>": {
+    "GET": [
+      200,
+      400
+    ]
+  },
+  "/payroll/periods/<int:period_id>/export.xlsx": {
+    "GET": [
+      200,
+      400
+    ]
+  },
+  "/payroll/periods/new": {
+    "GET": [
+      200
+    ],
+    "POST": [
+      303,
+      400
+    ]
+  },
+  "/payroll/rates": {
+    "GET": [
+      200
+    ],
+    "POST": [
+      303
+    ]
+  },
+  "/payroll/terms": {
+    "GET": [
+      200
+    ],
+    "POST": [
+      303,
+      400,
+      403
+    ]
+  },
+  "/payroll/versions/<int:version_id>/action": {
+    "POST": [
+      303,
+      400,
+      403
+    ]
+  },
+  "/payroll/versions/<int:version_id>/piece-confirm": {
+    "POST": [
+      303,
+      400
+    ]
+  },
+  "/payroll/versions/<int:version_id>/piece-preview": {
+    "POST": [
+      200
+    ]
+  },
+  "/personnel": {
+    "GET": [
+      200,
+      400
+    ]
+  },
+  "/personnel/<kind>/<int:record_id>/edit": {
+    "POST": [
+      303
+    ],
+    "GET": [
+      400
+    ]
+  },
+  "/personnel/<kind>/<int:record_id>/status": {
+    "POST": [
+      303,
+      400
+    ]
+  },
+  "/personnel/<kind>/new": {
+    "POST": [
+      303,
+      400
+    ],
+    "GET": [
+      200
+    ]
+  },
+  "/personnel/availability": {
+    "GET": [
+      200
+    ],
+    "POST": [
+      303
+    ]
+  },
+  "/personnel/available-workers.json": {
+    "GET": [
+      200
+    ]
+  },
+  "/personnel/brigades": {
+    "GET": [
+      200
+    ],
+    "POST": [
+      303
+    ]
+  },
+  "/personnel/brigades/<int:brigade_id>": {
+    "POST": [
+      303,
+      400
+    ],
+    "GET": [
+      200,
+      400
+    ]
+  },
+  "/personnel/brigades/<int:brigade_id>/members.json": {
+    "GET": [
+      200,
+      400
+    ]
+  },
+  "/personnel/contractors/<int:contractor_id>/share": {
+    "POST": [
+      303
+    ]
+  },
+  "/personnel/import": {
+    "GET": [
+      200
+    ],
+    "POST": [
+      303,
+      403
+    ]
+  },
+  "/personnel/import-history": {
+    "GET": [
+      200
+    ]
+  },
+  "/personnel/import/<session_id>": {
+    "POST": [
+      303,
+      400
+    ],
+    "GET": [
+      200,
+      400
+    ]
+  },
+  "/personnel/import/template.xlsx": {
+    "GET": [
+      200
+    ]
+  },
+  "/personnel/workers": {
+    "GET": [
+      200
+    ]
+  },
+  "/personnel/workers/<int:employee_id>": {
+    "GET": [
+      200,
+      400
+    ]
+  },
+  "/personnel/workers/<int:employee_id>/assignment": {
+    "POST": [
+      400
+    ]
+  },
+  "/progress": {
+    "GET": [
+      200,
+      400
+    ]
+  },
+  "/projects": {
+    "GET": [
+      200
+    ]
+  },
+  "/projects/<int:project_id>": {
+    "GET": [
+      200,
+      403
+    ],
+    "POST": [
+      303,
+      403
+    ]
+  },
+  "/projects/<int:project_id>/buildings": {
+    "POST": [
+      303,
+      400
+    ]
+  },
+  "/projects/new": {
+    "GET": [
+      200
+    ],
+    "POST": [
+      303,
+      400
+    ]
+  },
+  "/projects/select": {
+    "POST": [
+      303
+    ]
+  },
+  "/settings": {
+    "GET": [
+      200
+    ]
+  },
+  "/shutdown": {
+    "POST": [
+      200,
+      403
+    ]
+  },
+  "/static/<path:filename>": {
+    "GET": [
+      200
+    ]
+  },
+  "/timesheets": {
+    "GET": [
+      200
+    ]
+  },
+  "/timesheets/<int:timesheet_id>": {
+    "GET": [
+      200,
+      400
+    ],
+    "POST": [
+      303,
+      400,
+      403
+    ]
+  },
+  "/timesheets/<int:timesheet_id>/export.xlsx": {
+    "GET": [
+      200,
+      400
+    ]
+  },
+  "/timesheets/<int:timesheet_id>/import": {
+    "GET": [
+      200,
+      400
+    ],
+    "POST": [
+      303,
+      400
+    ]
+  },
+  "/timesheets/<int:timesheet_id>/preview/<preview_id>": {
+    "GET": [
+      200,
+      400
+    ],
+    "POST": [
+      303,
+      400
+    ]
+  },
+  "/timesheets/new": {
+    "GET": [
+      200
+    ],
+    "POST": [
+      303,
+      400
+    ]
+  },
+  "/timesheets/template.xlsx": {
+    "GET": [
+      200
+    ]
+  },
+  "/volumes": {
+    "GET": [
+      200,
+      400
+    ]
+  },
+  "/volumes/items": {
+    "POST": [
+      303,
+      400
+    ]
+  },
+  "/volumes/lines": {
+    "POST": [
+      303,
+      400
+    ]
+  },
+  "/volumes/lines/remove": {
+    "POST": [
+      303
+    ]
+  },
+  "/volumes/plans": {
+    "POST": [
+      303,
+      400,
+      403
+    ]
+  },
+  "/volumes/plans/<int:version_id>/approve": {
+    "POST": [
+      303,
+      400
+    ]
+  },
+  "/work-orders": {
+    "GET": [
+      200
+    ]
+  },
+  "/work-orders/<int:order_id>": {
+    "GET": [
+      200,
+      400
+    ]
+  },
+  "/work-orders/<int:order_id>/cancel": {
+    "POST": [
+      303,
+      400
+    ]
+  },
+  "/work-orders/<int:order_id>/edit": {
+    "GET": [
+      200,
+      400
+    ],
+    "POST": [
+      303,
+      400
+    ]
+  },
+  "/work-orders/<int:order_id>/issue": {
+    "POST": [
+      303,
+      400,
+      403
+    ]
+  },
+  "/work-orders/<int:order_id>/lines/<int:line_id>/events/<kind>": {
+    "GET": [
+      200,
+      400
+    ],
+    "POST": [
+      303
+    ]
+  },
+  "/work-orders/<int:order_id>/lines/<int:line_id>/match": {
+    "GET": [
+      200,
+      400
+    ],
+    "POST": [
+      303,
+      400
+    ]
+  },
+  "/work-orders/<int:order_id>/lines/<int:line_id>/writeoff": {
+    "POST": [
+      303,
+      400
+    ]
+  },
+  "/work-orders/<int:order_id>/print": {
+    "GET": [
+      200,
+      400
+    ]
+  },
+  "/work-orders/<int:order_id>/transfer": {
+    "GET": [
+      200,
+      400
+    ],
+    "POST": [
+      303,
+      400,
+      403
+    ]
+  },
+  "/work-orders/<int:order_id>/workflow/<action>": {
+    "POST": [
+      303,
+      400
+    ]
+  },
+  "/work-orders/control": {
+    "GET": [
+      200,
+      400
+    ]
+  },
+  "/work-orders/control/export.xlsx": {
+    "GET": [
+      200
+    ]
+  },
+  "/work-orders/new": {
+    "POST": [
+      303,
+      400
+    ],
+    "GET": [
+      200
+    ]
+  },
+  "/work-orders/resolutions/<int:resolution_id>/revoke": {
+    "POST": [
+      303,
+      400
+    ]
+  },
+  "/work-orders/transfers/<int:transfer_id>/cancel": {
+    "POST": [
+      303,
+      400
+    ]
+  }
+}

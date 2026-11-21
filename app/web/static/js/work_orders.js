@@ -15,24 +15,21 @@
   }
   function bindLine(row) {
     if (row.dataset.inherited === "1") return;
-    var building = row.querySelector("[data-building]"), floor = row.querySelector("[data-floor]");
-    var element = row.querySelector("[data-element]"), type = row.querySelector("[data-work-type]");
     var work = row.querySelector("[data-work-item]");
-    var options = Array.from(work.options).filter(function (o) { return o.value; });
-    function matches(o, withElement, withType) {
-      return (!building.value || o.dataset.building === building.value) &&
-        (!floor.value || o.dataset.floor === floor.value) &&
-        (!withElement || !element.value || o.dataset.element === element.value) &&
-        (!withType || !type.value || o.dataset.workType === type.value);
-    }
+    var search = row.querySelector("[data-work-search]");
     function update() {
-      filter(floor, function (o) { return !building.value || o.dataset.building === building.value; });
-      filter(element, function (o) { return options.some(function (w) { return matches(w, false, false) && w.dataset.element === o.value; }); });
-      filter(type, function (o) { return options.some(function (w) { return matches(w, true, false) && w.dataset.workType === o.value; }); });
-      filter(work, function (o) { return matches(o, true, true); });
-      row.querySelector("span[data-unit]").textContent = work.selectedIndex >= 0 ? (work.options[work.selectedIndex].dataset.unit || "—") : "—";
+      var option = work.selectedOptions[0];
+      row.querySelector("[data-unit]").textContent = option && option.dataset.unit || "";
+      row.querySelector("[data-location]").textContent = option && option.dataset.location || "";
     }
-    [building, floor, element, type, work].forEach(function (select) { select.addEventListener("change", update); });
+    search.addEventListener("input", function () {
+      var query = search.value.trim().toLocaleLowerCase("ru");
+      Array.from(work.options).forEach(function (option) {
+        var description = option.text + " " + (option.dataset.location || "");
+        option.hidden = !!option.value && !option.selected && !description.toLocaleLowerCase("ru").includes(query);
+      });
+    });
+    work.addEventListener("change", update);
     bindRemove(row); update();
   }
   var contractor = form.querySelector('[name="contractor_id"]');
@@ -63,6 +60,7 @@
     var fragment = document.getElementById("order-line-template").content.cloneNode(true);
     var row = fragment.querySelector("[data-order-line]");
     document.getElementById("order-lines").appendChild(fragment); bindLine(row);
+    row.querySelector("[data-work-search]").focus();
   });
   document.getElementById("add-order-crew").addEventListener("click", function () {
     var fragment = document.getElementById("order-crew-template").content.cloneNode(true);

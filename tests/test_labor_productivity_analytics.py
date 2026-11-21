@@ -20,6 +20,10 @@ def labor_school(db, monkeypatch):
     clock = {'value': '2026-11-10T10:00:00Z'}
     monkeypatch.setattr('app.repositories.timesheet_repository.instant',
                         lambda value=None: instant(value or clock['value']))
+    monkeypatch.setattr("app.repositories.brigade_repository.instant",
+                        lambda value=None: instant(value or clock["value"]))
+    monkeypatch.setattr("app.repositories.personnel_repository.instant",
+                        lambda value=None: instant(value or clock["value"]))
     people, brigades = PersonnelRepository(db), BrigadeRepository(db)
     contractor = people.save_contractor(dict(name='Подрядчик производительности'))
     specialty = people.save_specialty('Исполнитель', 'LP-43')

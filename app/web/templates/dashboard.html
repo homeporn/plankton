@@ -1,11 +1,29 @@
 {% extends 'base.html' %}
 {% from '_macros.html' import dates, meter, badge with context %}
 {% block title %}Сводка{% endblock %}
-{% block heading %}Сводка проекта{% endblock %}
+{% block heading %}Сводка объекта{% endblock %}
 {% block subtitle %}Физический прогресс по утверждённым объёмам и нормативной трудоёмкости{% endblock %}
-{% block heading_action %}<a class="button" href="{{ url_for('volumes.index') }}">Открыть ведомость →</a>{% endblock %}
 {% block content %}
-<form class="panel date-toolbar" method="get">{{ dates(report_date, cutoff) }}<button class="secondary" type="submit">Обновить срез</button></form>
+<nav class="object-actions" aria-label="Действия на объекте">
+{% for endpoint,label in [('events.facts','Внести факт'),('events.confirmations','Подтвердить объём'),('work_orders.edit','Создать наряд'),('timesheets.index','Открыть табель'),('labor.overview','Производительность'),('payroll.overview','Начисления')] %}
+{% if current_project.status!='archived' or loop.index>3 %}<a class="{{ 'primary-action' if loop.first else '' }}" href="{{ url_for(endpoint) }}">{{ label }}</a>{% endif %}
+{% endfor %}</nav>
+<div class="dashboard-top">
+{% if not historical %}<section class="panel"><h2>Требует внимания</h2><div class="attention-list">
+<a href="{{ url_for('work_orders.index',status='submitted') }}"><span>Наряды на проверке</span><strong>{{ orders }}</strong></a>
+<a href="{{ url_for('timesheets.index') }}"><span>Неутверждённые табели</span><strong>{{ sheets }}</strong></a>
+<a href="{{ url_for('labor.allocations') }}"><span>Нераспределённые часы · СМР с начала месяца</span><strong>{{ (hours|number ~ ' ч') if hours is not none else 'Нет табеля' }}</strong></a>
+{% if conflicts %}<p>Конфликт распределения часов · {{ conflicts }}</p>{% endif %}
+<a href="{{ url_for('payroll.periods') }}"><span>Периоды до утверждения</span><strong>{{ periods }}</strong></a>
+<a href="{{ url_for('analytics.index',tab='deviations',deviation='overrun') }}">Проверить превышения плана СМР →</a></div>
+{% if review_orders or open_sheets or open_periods %}<details><summary>Открыть документ</summary>
+<ul>{% for row in review_orders %}<li><a href="{{ url_for('work_orders.detail',order_id=row.id) }}">Наряд {{ row.order_number }}</a></li>{% endfor %}
+{% for row in open_sheets %}<li><a href="{{ url_for('timesheets.detail',timesheet_id=row.id) }}">Табель · {{ row.contractor_name }} · {{ '%02d.%04d'|format(row.month,row.year) }}</a></li>{% endfor %}
+{% for row in open_periods %}<li><a href="{{ url_for('payroll.detail',period_id=row.id) }}">Расчёт · {{ row.contractor_name }} · {{ '%02d.%04d'|format(row.month,row.year) }}</a></li>{% endfor %}</ul></details>{% endif %}
+</section>{% endif %}
+<section class="panel"><h2>Последние записи журналов</h2><ol class="activity-list">
+{% for row in recent %}<li><a href="{{ url_for('events.facts' if row.kind=='fact' else 'events.confirmations',discipline=row.discipline,report_date=report_date,knowledge_cutoff=cutoff) }}">{{ 'Факт' if row.kind=='fact' else 'Подтверждение' }} · {{ row.code }}</a> {{ row.quantity_delta|number }} {{ row.unit }} <small>{{ row.business_date }} · {{ row.building_name }}</small></li>{% else %}<li>Записей в выбранном срезе пока нет.</li>{% endfor %}</ol></section></div>
+<details class="dashboard-details"{% if historical %} open{% endif %}><summary>Дата и параметры среза · {{ report_date }}</summary><form class="panel date-toolbar" method="get">{{ dates(report_date, cutoff) }}<button class="secondary" type="submit">Обновить срез</button><a href="{{ url_for('dashboard.index') }}">На сегодня</a></form></details>
 <div class="section-label"><h2>Показатели готовности</h2><span class="muted">На {{ report_date }} · Направления рассчитываются отдельно</span></div>
 <section class="metrics">
 {% for section in sections %}

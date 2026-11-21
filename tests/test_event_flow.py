@@ -284,3 +284,54 @@ def test_forged_event_source_does_not_override_manual_web_origin(client, db, ite
 def test_bad_tab_and_unknown_selected_work_are_validation_errors(client):
     assert get(client,"/confirmations?tab=bad").status_code==400
     assert get(client,"/confirmations?work_item_id=999").status_code==400
+
+
+def test_complete_confirmation_is_visible_without_an_entry_action(client, events, item, plan):
+    fact(events, item)
+    confirm(events, item, "600")
+    response = get(client, "/confirmations?tab=all")
+    assert table_ids(response) == [str(item)]
+    assert "Подтверждено полностью" in response.text
+    assert 'name="quantity_delta"' not in response.text
+
+
+def test_work_search_applies_before_pagination_and_retains_filters(client, work, db):
+    version = work.create_plan_version("CONSTRUCTION")
+    ids = []
+    for n in range(52):
+        floor = work.add_floor(1, "Секция-" + str(n), n)
+        item_id = work.add_work_item(1, floor, 1)
+        work.add_plan_line(version, item_id, "10", "1")
+        ids.append(item_id)
+    work.approve_plan_version(version)
+    assert str(ids[-1]) not in table_ids(get(client, "/facts"))
+    response = get(client, "/facts?" + urlencode(dict(q="сЕкЦиЯ-51", building_id=1)))
+    assert table_ids(response) == [str(ids[-1])]
+    values = data(ids[-1], "1", "search-flow")
+    values["floor_id"] = work.list_floors()[-1]["id"]
+    saved = post(client, "/facts?q=51&building_id=1", values)
+    assert saved.status_code == 303 and "q=51" in saved.location and "building_id=1" in saved.location
+
+
+def test_invalid_confirmation_retains_user_input_without_creating_event(client, events, item, plan, db):
+    fact(events, item)
+    values = dict(data(item, "700", "preserve"), comment="Уточнение к акту")
+    response = post(client, "/confirmations", values)
+    assert response.status_code == 400
+    assert 'role="alert"' in response.text and "Подтверждение превышает факт" in response.text
+    assert 'value="700"' in response.text and 'value="Акт №1"' in response.text
+    assert 'Уточнение к акту' in response.text
+    assert not db.execute("SELECT 1 FROM confirmation_events").fetchone()
+
+
+def test_short_form_shows_date_of_latest_fact_in_visible_slice(client, events, item, plan):
+    fact(events, item)
+    fact(events, item, "10", "later", date="2026-01-17", recorded="2026-01-18T12:00:00Z")
+    before = get(client, "/confirmations?report_date=2026-01-31&knowledge_cutoff=2026-01-12T12:00:00Z")
+    assert "Последний факт 2026-01-10" in before.text
+    assert "Последний факт 2026-01-17" not in before.text
+    today_page = get(client, "/confirmations")
+    assert "Последний факт 2026-01-17" in today_page.text
+    values = dict(data(item, "12", "short"), location_from_work="1")
+    del values["building_id"], values["floor_id"]
+    assert post(client, "/confirmations", values).status_code == 303

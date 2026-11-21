@@ -1,0 +1,16 @@
+{
+  "light": {
+    "background": "brand.milk",
+    "surface": "brand.sage",
+    "text": "brand.deep",
+    "action": "brand.forest",
+    "on-action": "brand.milk"
+  },
+  "dark": {
+    "background": "brand.deep",
+    "surface": "brand.forest",
+    "text": "brand.milk",
+    "action": "brand.sage",
+    "on-action": "brand.deep"
+  }
+}

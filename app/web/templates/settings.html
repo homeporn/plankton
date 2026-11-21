@@ -1,18 +1,18 @@
 {% extends 'base.html' %}
 {% block title %}Настройки приложения{% endblock %}
 {% block heading %}Настройки приложения{% endblock %}
-{% block subtitle %}Параметры текущего локального запуска{% endblock %}
+{% block subtitle %}Параметры текущего запуска{% endblock %}
 {% block content %}
-<section class="panel"><h2>Локальное приложение</h2>
+<section class="panel"><h2>{{ 'Закрытый демонстрационный стенд' if config.get('CLOUD_DEMO') else 'Локальное приложение' }}</h2>
 <dl class="settings-info">
 <dt>Продукт</dt><dd>{{ product_name }}</dd>
 <dt>Адрес приложения</dt><dd>{{ environment.address }}</dd>
 <dt>Рабочая база</dt><dd>{{ environment.database }}</dd>
 <dt>Система</dt><dd>{{ environment.system }} · {{ environment.architecture }}</dd>
 <dt>Python / SQLite / Flask</dt><dd>{{ environment.python }} / {{ environment.sqlite }} / {{ environment.flask }}</dd>
-<dt>Сетевой режим</dt><dd>Локальный. Подключение к интернету не требуется.</dd>
+<dt>Сетевой режим</dt><dd>{{ 'HTTPS через закрытый прокси' if config.get('CLOUD_DEMO') else 'Локальный. Подключение к интернету не требуется.' }}</dd>
 </dl>
-<p class="help">Путь к базе и адрес задаются при запуске приложения. Перед обновлением остановите сервер и сохраните резервную копию базы. Диагностика в Terminal: <code>./start.command --check</code>.</p>
+{% if not config.get("CLOUD_DEMO") %}<p class="help">Путь к базе и адрес задаются при запуске приложения. Перед обновлением остановите сервер и сохраните резервную копию базы. Диагностика в Terminal: <code>./start.command --check</code>.</p>{% endif %}
 </section>
 <section class="panel"><h2>Настройки рабочего пространства</h2><p>Текущий объект: <strong>{{ current_project.name }}</strong>.</p><a class="button secondary" href="{{ url_for('projects.detail', project_id=current_project.id) }}">Открыть карточку объекта</a></section>
 {% endblock %}

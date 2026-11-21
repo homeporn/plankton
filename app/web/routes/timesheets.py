@@ -121,6 +121,7 @@ def create():
     now = date.today()
     return render_template("timesheet_create.html", contractors=PersonnelRepository(
         get_db(), current_project_id()).list_contractors(active_only=True),
+        contractor_id=integer(request.args, "contractor_id", "Подрядчик", optional=True),
         year=now.year, month=now.month, **common_context())
 
 
@@ -200,6 +201,8 @@ def detail(timesheet_id):
     current_version = live_versions[0] if live_versions else report["versions"][0]
     from app.web.pagination import paginate
     report["worker_count"]=len(report["workers"])
+    report["filled_days"] = sum(len(worker["entries"]) for worker in report["workers"])
+    report["missing_days"] = report["worker_count"] * len(report["days"]) - report["filled_days"]
     report["workers"]=paginate(report["workers"],"worker_page")
     report["eligible_workers"]=paginate(report["eligible_workers"],"eligible_page")
     bulk_workers=paginate(bulk_workers,"bulk_page")

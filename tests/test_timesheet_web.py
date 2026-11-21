@@ -247,3 +247,25 @@ def test_foreign_timesheet_url_version_preview_and_contractor_rejected(client, t
     assert post(client, "/timesheets/new", dict(contractor_id=s["personnel"]["contractor"], year=2026,
                                                 month=10, operation_key="foreign-company")).status_code == 400
     assert s["repo"].report(s["sid"])["total_hours"] == 0
+
+
+def test_filtered_register_keeps_contractor_on_new_timesheet(client, personnel):
+    contractor = personnel["contractor"]
+    register = get(client, f"/timesheets?contractor_id={contractor}").get_data(as_text=True)
+    create_url = f"/timesheets/new?contractor_id={contractor}"
+    assert f'href="{create_url}"' in register
+    assert f'value="{contractor}" selected' in get(client, create_url).get_data(as_text=True)
+
+
+def test_day_shortcut_sets_both_dates_and_shows_whole_sheet_completion(client, timesheet):
+    from html import unescape
+    import re
+
+    assert post(client, path(timesheet), cell(timesheet, code="Б", hours="0")).status_code == 303
+    page = get(client, path(timesheet)).get_data(as_text=True)
+    link = re.search(r'<a class="ts-day-link" href="([^"]*as_of=2026-10-21[^"]*)"', page)
+    assert link and link.group(1).endswith("#bulk-fill")
+    assert 'Заполнено <strong>1</strong>' in page and 'Не заполнено <strong>61</strong>' in page
+    bulk = get(client, unescape(link.group(1))).get_data(as_text=True)
+    for field in ("as_of", "start_date", "end_date"):
+        assert f'name="{field}" value="2026-10-21"' in bulk

@@ -14,6 +14,15 @@
   document.querySelectorAll('[data-search-select]').forEach(searchSelect);
   var form=document.getElementById('work-order-transfer-form');
   if (!form) return;
+  form.querySelectorAll("[data-use-remaining]").forEach(function (button) {
+    button.addEventListener("click", function () {
+      var row = button.closest("tr");
+      row.querySelector('[name="source_line_id"]').checked = true;
+      var amount = row.querySelector('input[inputmode="decimal"]');
+      amount.value = button.dataset.useRemaining;
+      amount.focus();
+    });
+  });
   var employer=form.querySelector('[name="contractor_id"]'),next=0;
   function filterCrew(row) {
     var specialty=row.querySelector('[data-crew-field="specialty"]'),search=row.querySelector('[data-crew-search]');

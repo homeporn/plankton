@@ -68,7 +68,7 @@ def main():
                         '/timesheets/'+str(ids['timesheet']),'/work-orders/'+str(ids['order'])):
                         assert page.goto(origin+route).status==200,route
                         assert page.title()==PRODUCT_NAME if route=='/' else page.title().endswith(' | '+PRODUCT_FAMILY_NAME)
-                        assert page.locator('.brand-title').inner_text()==PRODUCT_FAMILY_NAME
+                        assert page.locator('.brand-title').inner_text()==PRODUCT_FAMILY_NAME.capitalize()
                         result['checks'].append(route)
                     page.goto(origin+'/')
                     for filename,collapsed in (('home.png',False),('collapsed.png',True)):

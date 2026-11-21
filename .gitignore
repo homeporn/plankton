@@ -15,3 +15,6 @@ data/*
 /build/
 /dist/
 .venv-windows-build/
+/.env
+/.env.*
+!/.env.example

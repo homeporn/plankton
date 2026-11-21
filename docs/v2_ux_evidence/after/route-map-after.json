@@ -1,0 +1,311 @@
+{
+  "static /static/<path:filename>": [
+    "GET"
+  ],
+  "dashboard.index /": [
+    "GET"
+  ],
+  "buildings.index /buildings": [
+    "GET"
+  ],
+  "buildings.listing /api/buildings": [
+    "GET"
+  ],
+  "buildings.change_floor /buildings/floors": [
+    "POST"
+  ],
+  "catalog.index /catalog": [
+    "GET"
+  ],
+  "catalog.save /catalog": [
+    "POST"
+  ],
+  "catalog.save_norm /catalog/norm": [
+    "POST"
+  ],
+  "volumes.index /volumes": [
+    "GET"
+  ],
+  "volumes.create_item /volumes/items": [
+    "POST"
+  ],
+  "volumes.create_plan /volumes/plans": [
+    "POST"
+  ],
+  "volumes.save_line /volumes/lines": [
+    "POST"
+  ],
+  "volumes.approve /volumes/plans/<int:version_id>/approve": [
+    "POST"
+  ],
+  "volumes.remove_line /volumes/lines/remove": [
+    "POST"
+  ],
+  "events.facts /facts": [
+    "GET",
+    "POST"
+  ],
+  "events.confirmations /confirmations": [
+    "GET",
+    "POST"
+  ],
+  "progress.index /progress": [
+    "GET"
+  ],
+  "projects.index /projects": [
+    "GET"
+  ],
+  "projects.create /projects/new": [
+    "GET",
+    "POST"
+  ],
+  "projects.select /projects/select": [
+    "POST"
+  ],
+  "projects.detail /projects/<int:project_id>": [
+    "GET",
+    "POST"
+  ],
+  "projects.buildings /projects/<int:project_id>/buildings": [
+    "POST"
+  ],
+  "projects.delete_building /projects/<int:project_id>/buildings/<int:building_id>/delete": [
+    "GET",
+    "POST"
+  ],
+  "personnel.index /personnel": [
+    "GET"
+  ],
+  "personnel.edit /personnel/<kind>/<int:record_id>/edit": [
+    "GET",
+    "POST"
+  ],
+  "personnel.edit /personnel/<kind>/new": [
+    "GET",
+    "POST"
+  ],
+  "personnel.status /personnel/<kind>/<int:record_id>/status": [
+    "POST"
+  ],
+  "work_orders.index /work-orders": [
+    "GET"
+  ],
+  "work_orders.control /work-orders/control": [
+    "GET"
+  ],
+  "work_orders.control_export /work-orders/control/export.xlsx": [
+    "GET"
+  ],
+  "work_orders.edit /work-orders/<int:order_id>/edit": [
+    "GET",
+    "POST"
+  ],
+  "work_orders.edit /work-orders/new": [
+    "GET",
+    "POST"
+  ],
+  "work_orders.detail /work-orders/<int:order_id>": [
+    "GET"
+  ],
+  "work_orders.issue /work-orders/<int:order_id>/issue": [
+    "POST"
+  ],
+  "work_orders.cancel /work-orders/<int:order_id>/cancel": [
+    "POST"
+  ],
+  "work_orders.printing /work-orders/<int:order_id>/print": [
+    "GET"
+  ],
+  "work_orders.workflow /work-orders/<int:order_id>/workflow/<action>": [
+    "POST"
+  ],
+  "work_orders.register_event /work-orders/<int:order_id>/lines/<int:line_id>/events/<kind>": [
+    "GET",
+    "POST"
+  ],
+  "work_orders.transfer /work-orders/<int:order_id>/transfer": [
+    "GET",
+    "POST"
+  ],
+  "work_orders.cancel_transfer /work-orders/transfers/<int:transfer_id>/cancel": [
+    "POST"
+  ],
+  "work_orders.writeoff /work-orders/<int:order_id>/lines/<int:line_id>/writeoff": [
+    "POST"
+  ],
+  "work_orders.revoke_writeoff /work-orders/resolutions/<int:resolution_id>/revoke": [
+    "POST"
+  ],
+  "work_orders.match /work-orders/<int:order_id>/lines/<int:line_id>/match": [
+    "GET",
+    "POST"
+  ],
+  "analytics.index /analytics/<tab>": [
+    "GET"
+  ],
+  "analytics.index /analytics": [
+    "GET"
+  ],
+  "analytics.download /analytics/export.xlsx": [
+    "GET"
+  ],
+  "analytics.group_form /analytics/groups/<int:group_id>": [
+    "GET",
+    "POST"
+  ],
+  "analytics.group_form /analytics/groups/new": [
+    "GET",
+    "POST"
+  ],
+  "analytics.group_action /analytics/groups/<int:group_id>/actions": [
+    "POST"
+  ],
+  "personnel_management.workers /personnel/workers": [
+    "GET"
+  ],
+  "personnel_management.worker_detail /personnel/workers/<int:employee_id>": [
+    "GET"
+  ],
+  "personnel_management.assign /personnel/workers/<int:employee_id>/assignment": [
+    "POST"
+  ],
+  "personnel_management.project_end /personnel/workers/<int:employee_id>/project-end": [
+    "POST"
+  ],
+  "personnel_management.availability /personnel/availability": [
+    "GET",
+    "POST"
+  ],
+  "personnel_management.share /personnel/contractors/<int:contractor_id>/share": [
+    "POST"
+  ],
+  "personnel_management.brigades /personnel/brigades": [
+    "GET",
+    "POST"
+  ],
+  "personnel_management.brigade_detail /personnel/brigades/<int:brigade_id>": [
+    "GET",
+    "POST"
+  ],
+  "personnel_management.brigade_members /personnel/brigades/<int:brigade_id>/members.json": [
+    "GET"
+  ],
+  "personnel_management.available_workers /personnel/available-workers.json": [
+    "GET"
+  ],
+  "personnel_import.start /personnel/import": [
+    "GET",
+    "POST"
+  ],
+  "personnel_import.template /personnel/import/template.xlsx": [
+    "GET"
+  ],
+  "personnel_import.wizard /personnel/import/<session_id>": [
+    "GET",
+    "POST"
+  ],
+  "personnel_import.history /personnel/import-history": [
+    "GET"
+  ],
+  "navigation.state /navigation/state": [
+    "POST"
+  ],
+  "navigation.settings /settings": [
+    "GET"
+  ],
+  "timesheets.index /timesheets": [
+    "GET"
+  ],
+  "timesheets.create /timesheets/new": [
+    "GET",
+    "POST"
+  ],
+  "timesheets.detail /timesheets/<int:timesheet_id>": [
+    "GET",
+    "POST"
+  ],
+  "timesheets.preview /timesheets/<int:timesheet_id>/preview/<preview_id>": [
+    "GET",
+    "POST"
+  ],
+  "timesheets.import_data /timesheets/<int:timesheet_id>/import": [
+    "GET",
+    "POST"
+  ],
+  "timesheets.export /timesheets/<int:timesheet_id>/export.xlsx": [
+    "GET"
+  ],
+  "timesheets.template /timesheets/template.xlsx": [
+    "GET"
+  ],
+  "labor.overview /labor": [
+    "GET"
+  ],
+  "labor.works /labor/works": [
+    "GET"
+  ],
+  "labor.contractors /labor/contractors": [
+    "GET"
+  ],
+  "labor.brigades /labor/brigades": [
+    "GET"
+  ],
+  "labor.allocations /labor/allocations": [
+    "GET",
+    "POST"
+  ],
+  "labor.attributions /labor/attributions": [
+    "GET",
+    "POST"
+  ],
+  "labor.history /labor/history": [
+    "GET"
+  ],
+  "labor.export /labor/export.xlsx": [
+    "GET"
+  ],
+  "payroll.overview /payroll": [
+    "GET"
+  ],
+  "payroll.terms /payroll/terms": [
+    "GET",
+    "POST"
+  ],
+  "payroll.rates /payroll/rates": [
+    "GET",
+    "POST"
+  ],
+  "payroll.operations /payroll/operations": [
+    "GET",
+    "POST"
+  ],
+  "payroll.periods /payroll/periods": [
+    "GET"
+  ],
+  "payroll.create /payroll/periods/new": [
+    "GET",
+    "POST"
+  ],
+  "payroll.detail /payroll/periods/<int:period_id>": [
+    "GET"
+  ],
+  "payroll.action /payroll/versions/<int:version_id>/action": [
+    "POST"
+  ],
+  "payroll.claims /payroll/claims": [
+    "GET",
+    "POST"
+  ],
+  "payroll.piece_preview /payroll/versions/<int:version_id>/piece-preview": [
+    "POST"
+  ],
+  "payroll.piece_confirm /payroll/versions/<int:version_id>/piece-confirm": [
+    "POST"
+  ],
+  "payroll.export /payroll/periods/<int:period_id>/export.xlsx": [
+    "GET"
+  ],
+  "shutdown /shutdown": [
+    "POST"
+  ]
+}

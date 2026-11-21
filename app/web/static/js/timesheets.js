@@ -14,13 +14,6 @@
       });
     });
   }
-  document.querySelectorAll('[data-select-employees]').forEach(function (button) {
-    button.addEventListener('click', function () {
-      button.closest('form').querySelectorAll('input[name="employee_id"]').forEach(function (input) {
-        input.checked = true;
-      });
-    });
-  });
   var dirty = false;
   document.querySelectorAll('[data-unsaved-warning]').forEach(function (form) {
     form.addEventListener('change', function () { dirty = true; });
@@ -41,17 +34,27 @@
   var form = document.querySelector('form.ts-bulk-form');
   if (!form) return;
   var keys = ['workspace_id', 'version_id', 'revision', 'brigade_id'];
-  var storageKey = 'cp-bulk-' + keys.map(function (key) {
+  var storageKey = 'cp-bulk-' + form.dataset.asOf + '-' + keys.map(function (key) {
     return form.elements[key] ? form.elements[key].value : '';
   }).join('-');
   var chosen = {};
   try { chosen = JSON.parse(sessionStorage.getItem(storageKey) || '{}'); } catch (_) { chosen = {}; }
   var inputs = Array.from(form.querySelectorAll('input[type="checkbox"][name="employee_id"]'));
   inputs.forEach(function (input) { input.checked = !!chosen[input.value]; });
+  var count = form.querySelector('[data-selected-employees]');
+  function showCount() {
+    count.textContent = 'Выбрано работников: ' + Object.keys(chosen).length;
+  }
+  showCount();
+  form.querySelector('[data-select-employees]').addEventListener('click', function () {
+    inputs.forEach(function (input) { input.checked = true; });
+    form.dispatchEvent(new Event('change', { bubbles: true }));
+  });
   function remember() {
     inputs.forEach(function (input) {
       if (input.checked) chosen[input.value] = true; else delete chosen[input.value];
     });
+    showCount();
     try { sessionStorage.setItem(storageKey, JSON.stringify(chosen)); } catch (_) {}
   }
   form.addEventListener('change', remember);

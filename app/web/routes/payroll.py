@@ -1,4 +1,5 @@
 """Local management accruals. Payroll repositories own all accounting writes."""
+from calendar import monthrange
 from datetime import date
 from decimal import Decimal
 from io import BytesIO
@@ -249,7 +250,16 @@ def create():
         pid = repository().create_period(contractor_id, integer(data, "year", "Год"), integer(data, "month", "Месяц"),
             norm_hours=str(norm), comment=text(data, "comment", "Комментарий", required=False, limit=2000), operation_key=_key())
         return redirect(url_for("payroll.detail", period_id=pid), code=303)
-    return _render("payroll_create.html", "periods", **_selectors())
+    today = date.today()
+    contractor_id = integer(request.args, "contractor_id", "Подрядчик", optional=True)
+    if contractor_id:
+        PersonnelRepository(get_db(), current_project_id()).contractor(contractor_id)
+    year = integer(request.args, "year", "Год", optional=True) or today.year
+    month = integer(request.args, "month", "Месяц", optional=True) or today.month
+    if not 1900 <= year <= 9999 or not 1 <= month <= 12:
+        raise InputError("Укажите календарный месяц и год от 1900 до 9999.")
+    return _render("payroll_create.html", "periods", contractor_id=contractor_id,
+                   year=year, month=month, **_selectors())
 
 
 def _report(period_id, version_id=None):
@@ -280,6 +290,39 @@ def _version_report(version_id, *, writable=False):
     return report
 
 
+def _source_summary(report, claims):
+    """Use frozen inputs for an existing run, current scoped sources for a new one."""
+    period = report["period"]
+    contractor = period["contractor_id"]
+    month = "{year:04d}-{month:02d}".format(**period)
+    if report["run"]:
+        calculator = report["sources"].get("calculator", {})
+        sheet = next((row for row in calculator.get("timesheets", [])
+                      if row["project_id"] == period["project_id"]), None)
+        terms = calculator.get("terms", [])
+        pieces = report["sources"].get("pieces", [])
+        return dict(sheet=sheet, terms=sum(row["status"] == "active" for row in terms),
+                    piece_count=len(pieces), frozen=True)
+
+    sheet = get_db().execute(
+        "SELECT t.id AS timesheet_id, v.id AS version_id, v.version_no "
+        "FROM timesheets t JOIN timesheet_versions v ON v.timesheet_id=t.id "
+        "WHERE t.project_id=? AND t.contractor_id=? AND t.year=? AND t.month=? "
+        "AND v.status='approved' ORDER BY v.version_no DESC LIMIT 1",
+        (period["project_id"], contractor, period["year"], period["month"])).fetchone()
+    start = month + "-01"
+    end = month + "-{:02d}".format(monthrange(period["year"], period["month"])[1])
+    rules = repository(PayrollRulesRepository)
+    terms = [row for row in rules.list_terms() if row["contractor_id"] == contractor
+             and row["status"] == "active" and row["valid_from"] <= end
+             and (not row["valid_to"] or row["valid_to"] > start)]
+    monthly_claims = [row for row in claims if row["effective_date"][:7] == month]
+    return dict(sheet=sheet, terms=len(terms), frozen=False,
+                piece_count=sum(row["remaining"] > 0 for row in monthly_claims),
+                conflicts=sum(row["remaining"] < 0 or row["assigned"] > row["available"]
+                              for row in monthly_claims))
+
+
 @bp.get("/payroll/periods/<int:period_id>")
 def detail(period_id):
     report = _report(period_id, integer(request.args, "version_id", "Версия", optional=True))
@@ -294,10 +337,13 @@ def detail(period_id):
     report["batches"] = paginate(report["batches"], "batch_page")
     report['employee_deltas']=paginate(report.get('employee_deltas',[]),'difference_page')
     claim_search=text(request.args,'claim_q','Поиск сопоставления',required=False)
-    claim_rows=[r for r in repository(PayrollPieceRepository).list_claims() if r['contractor_id']==report['period']['contractor_id']
-        and (not claim_search or claim_search.casefold() in (str(r['claim_id'])+' '+r.get('code','')+' '+r.get('name','')).casefold())]
+    contractor_id = report["period"]["contractor_id"]
+    claims = [row for row in repository(PayrollPieceRepository).list_claims()
+              if row["contractor_id"] == contractor_id] if editable or not report["run"] else []
+    matching_claims = [row for row in claims if not claim_search or claim_search.casefold() in
+                       "{} {} {}".format(row["claim_id"], row["code"], row["name"]).casefold()]
     return _render("payroll_detail.html", "periods", report=report, editable=editable, latest=report["version"]["id"] == latest,
-        claims=claim_rows[:100],claim_search=claim_search,
+        claims=matching_claims[:100], claim_search=claim_search, source_summary=_source_summary(report, claims),
         **_selectors(contractor_id=report["period"]["contractor_id"]))
 
 

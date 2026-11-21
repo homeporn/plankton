@@ -1,0 +1,70 @@
+name: plankton-time-v2
+x-sandbox: &sandbox
+  user: "${DEMO_UID:-1000}:${DEMO_GID:-1000}"
+  read_only: true
+  cap_drop: [ALL]
+  security_opt: [no-new-privileges:true]
+  restart: unless-stopped
+  tmpfs:
+    - /tmp:rw,noexec,nosuid,nodev,size=64m,mode=1777
+  logging:
+    driver: json-file
+    options:
+      max-size: 5m
+      max-file: "3"
+services:
+  app:
+    <<: *sandbox
+    image: ${APP_IMAGE:-plankton-time:v2}
+    build: .
+    network_mode: none
+    environment:
+      DEMO_ORIGIN: https://${DEMO_HOST:-127.0.0.1}:${DEMO_PORT:-8443}
+    volumes:
+      - type: bind
+        source: ${STATE_DIR:?Specify absolute STATE_DIR}
+        target: /state
+        bind: {create_host_path: false}
+      - type: bind
+        source: ${CONFIG_DIR:?Specify absolute CONFIG_DIR}/session.key
+        target: /run/session.key
+        read_only: true
+        bind: {create_host_path: false}
+      - type: bind
+        source: ${CONFIG_DIR}/socket
+        target: /run/plankton
+        bind: {create_host_path: false}
+    healthcheck:
+      test: [CMD, python, -m, deploy.cloud, health]
+      interval: 20s
+      start_period: 20s
+      start_interval: 1s
+      timeout: 5s
+      retries: 3
+    stop_grace_period: 40s
+  proxy:
+    <<: *sandbox
+    image: ${PROXY_IMAGE:?Specify pinned proxy image}
+    entrypoint: [nginx, -g, "daemon off;"]
+    depends_on:
+      app: {condition: service_healthy}
+    ports:
+      - "127.0.0.1:${DEMO_PORT:-8443}:8443"
+    volumes:
+      - type: bind
+        source: ./deploy/proxy/nginx.conf
+        target: /etc/nginx/nginx.conf
+        read_only: true
+        bind: {create_host_path: false}
+      - type: bind
+        source: ${CONFIG_DIR}/proxy
+        target: /run/access
+        read_only: true
+        bind: {create_host_path: false}
+      - type: bind
+        source: ${CONFIG_DIR}/socket
+        target: /run/plankton
+        read_only: true
+        bind: {create_host_path: false}
+    stop_signal: SIGQUIT
+    stop_grace_period: 40s

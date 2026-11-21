@@ -1,4 +1,6 @@
-<form method="get" class="panel filters" data-dependent-form><div class="filter-grid">
+<form method="get" class="panel filters" data-dependent-form action="{{ url_for(journal_endpoint) }}">
+<div class="inline-form"><label>Поиск работы<input type="search" name="q" maxlength="160" value="{{ search }}" placeholder="Код, название, корпус или этаж"></label><button class="secondary" type="submit">Найти</button>{% if search %}<a href="{{ url_for(journal_endpoint, discipline=discipline.value, tab=tab, correction='1' if correction_mode else '0') }}">Сбросить поиск</a>{% endif %}</div>
+<details class="form-section"{% if filters.building_id or filters.floor_id or filters.element or filters.work_type or read_only %} open{% endif %}><summary>Фильтры и дата среза · {{ discipline_labels[discipline] }}</summary><div class="filter-grid">
 <label>Направление<select name="discipline" aria-label="Направление" data-reset-version>{% for key,label in discipline_labels.items() %}<option value="{{ key }}" {% if discipline.value==key %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></label>
 <label>Корпус<select name="building_id" data-building aria-label="Корпус"><option value="">Все корпуса</option>{% for b in buildings %}<option value="{{ b.id }}" {% if filters.building_id==b.id %}selected{% endif %}>{{ b.name }}</option>{% endfor %}</select></label>
 <label>Этаж<select name="floor_id" data-floor aria-label="Этаж"><option value="">Все этажи</option>{% for f in floors %}<option value="{{ f.id }}" data-building="{{ f.building_id }}" {% if filters.floor_id==f.id %}selected{% endif %}>{{ f.building_name }} · {{ f.floor_code }}</option>{% endfor %}</select></label>
@@ -8,4 +10,4 @@
 <label>Дата среза<input type="date" name="report_date" value="{{ report_date }}" required></label>
 <label class="wide-field">Отсечение знаний<input name="knowledge_cutoff" value="{{ request.args.get('knowledge_cutoff','') }}" placeholder="Текущий момент, либо время ISO с часовым поясом" maxlength="40"></label>
 <input type="hidden" name="tab" value="{{ tab }}">{% if correction_mode %}<input type="hidden" name="correction" value="1">{% endif %}
-<div class="filter-actions"><button class="secondary" type="submit">Показать</button><a href="{{ url_for(journal_endpoint,discipline=discipline.value) }}">Сбросить</a></div></div></form>
+<div class="filter-actions"><button class="secondary" type="submit">Показать</button><a href="{{ url_for(journal_endpoint,discipline=discipline.value) }}">Сбросить</a></div></div></details></form>

@@ -66,7 +66,8 @@ def create_app(config=None):
             request.max_content_length = 5 * 1024 * 1024 + 64 * 1024
             request.max_form_memory_size = 5 * 1024 * 1024
         expected = app.config["LOCAL_ORIGIN"]
-        if request.host != urlsplit(expected).netloc or request.remote_addr != "127.0.0.1":
+        expected_peer = "localhost" if app.config.get("CLOUD_DEMO") else "127.0.0.1"
+        if request.host != urlsplit(expected).netloc or request.remote_addr != expected_peer:
             abort(403)
         if request.method not in ("GET", "HEAD", "OPTIONS"):
             if request.headers.get("Origin") != expected or request.headers.get("Sec-Fetch-Site") == "cross-site":
@@ -155,6 +156,8 @@ def create_app(config=None):
 
     @app.post("/shutdown")
     def shutdown():
+        if app.config.get("CLOUD_DEMO"):
+            abort(404)
         stop = app.extensions.get("stop_server")
         if stop:
             stop()
